@@ -44,54 +44,54 @@
                 RelativeLayout:
                     size_hint: 1, None
                     height: dp(30)
-                    Label:
-                        id: text_playlists_path
-                        text: root.playlists_dir
-                        size_hint: None, None
-                        height: dp(30)
-                        width: self.texture_size[0]
+                    AnchorLayout:
+                        anchor_x: 'left'
+                        anchor_y: 'center'
+                        Label:
+                            id: text_playlists_path
+                            text: root.playlists_dir
+                            size_hint: None, None
+                            height: dp(30)
+                            width: self.texture_size[0]
                         
-                    Widget:
-                        canvas.before:
-                            Color:
-                                rgba: root.bg_color
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                        size_hint: None, None
-                        height: dp(30)
-                        width: text_playlists_path.width
-                        x: self.parent.width - self.width
-
-                    ButtonLabel:
-                        id: text_playlists_path
-                        #parent_scrollview: sv
-                        text: 'Edit'
-                        size_hint: None, None
-                        height: dp(30)
-                        width: self.texture_size[0] + self.texture_size[0]/2
-                        x: self.parent.width - self.width
-                        #on_release: Factory.PopupDirChooser(root.set_playlists_dir, path=root.playlists_dir).open()
-                        on_release: root.open_popup_dir_chooser()
-                        on_press: print(self.pos)
+                    AnchorLayout:
+                        anchor_x: 'right'
+                        anchor_y: 'center'
+                        ButtonImage:
+                            id: text_playlists_path
+                            #text: 'Edit'
+                            source: 'icons/edit.png'
+                            size_hint: None, None
+                            #height: dp(30)
+                            #width: self.texture_size[0] + self.texture_size[0]/2
+                            height: 25
+                            width: 25
+                            #x: self.parent.width - self.width
+                            #on_release: Factory.PopupDirChooser(root.set_playlists_dir, path=root.playlists_dir).open()
+                            on_release: root.open_popup_dir_chooser()
+                            on_press: print(self.pos)
                         
-                BoxLayout:
+                RelativeLayout:
                     size_hint: 1, None
                     height: dp(30)
-                    orientation: 'horizontal'
-                    Label:
-                        #parent_scrollview: sv
-                        text: 'Follow playing song'
-                        size_hint: None, None
-                        height: dp(30)
-                        width: self.texture_size[0]
+                    AnchorLayout:
+                        anchor_x: 'left'
+                        anchor_y: 'center'
+                        Label:
+                            text: 'Follow playing song'
+                            size_hint: None, None
+                            height: dp(30)
+                            width: self.texture_size[0]
                         
-                    Widget: #Filler
-                    CheckBox:
-                        id: follow_checkbox
-                        size_hint: None, 1
-                        width: dp(30)
-                        active: False
+                    AnchorLayout:
+                        anchor_x: 'right'
+                        anchor_y: 'center'
+                        Widget: #Filler
+                        CheckBox:
+                            id: follow_checkbox
+                            size_hint: None, 1
+                            width: dp(30)
+                            active: False
 
         ButtonLabel:
             size_hint: 1, None

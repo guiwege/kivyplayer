@@ -79,10 +79,30 @@
                     size_hint: .10, 1
                     on_release: app.song_next()
                 #ButtonLabelShuffle:
-                ButtonLabelToggle:
-                    id: shuffle_button
-                    text: 'X'
+                AnchorLayout:
+                    anchor_x: 'center'
+                    anchor_y: 'center'
                     size_hint: .10, 1
+                    ButtonLabelToggle:
+                        id: shuffle_button
+                        #text: '\u279a'
+                        #font_name: "DejaVuSans.ttf"
+                        #font_size: sp(24)
+                        #text: 'X'
+                        size_hint: None, None
+                        size: (30, 30)
+                        canvas.before:
+                            Color:
+                                rgba: (0, 1, 1, 1) if self.toggle else (1, 1, 1, 1)
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                                source: 'icons/shuffle_2.png'
+                    #ButtonImageToggle:
+                    #    id: shuffle_button
+                    #    size_hint: None, None
+                    #    size: (20, 20)
+                    #    source: 'icons/shuffle_2.png'
                 Slider:
                     id: volume_slider
                     size_hint: .20, 1
