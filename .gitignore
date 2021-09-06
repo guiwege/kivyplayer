@@ -1,0 +1,4 @@
+*.json
+*.xcf
+*.playlist
+__pycache__/*

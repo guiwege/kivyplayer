@@ -1,0 +1,36 @@
+
+<ButtonLabel>:
+    on_press: self.on_press()
+    on_release: self.on_release()
+
+<ButtonLabelBkp>:
+    canvas.before:
+        Color:
+            rgba: (0, 0, 0, .6) if self.mouse_over else (0, 0, 0, 0)
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [(10, 10), (10, 10), (10, 10), (10, 10)]
+    on_press: self.on_press()
+    on_release: self.on_release()
+
+
+
+<ButtonLabelAddSongToPlaylist>:
+    on_press: self.on_press()
+    on_release: self.on_release()
+
+<ButtonLabelToggle>:
+    #color: self.normal_color if self.toggle else self.toggle_color
+    color: (0, 1, 1, 1) if self.toggle else (1, 1, 1, 1)
+    #on_release: self.on_release()
+
+
+<MouseOverBehaviorr>:
+    canvas.before:
+        Color:
+            rgba: (0, 0, 0, .6) if self.mouse_over else (0, 0, 0, 0)
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [(10, 10), (10, 10), (10, 10), (10, 10)]

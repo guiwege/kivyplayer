@@ -1,0 +1,245 @@
+
+#:import FadeTransition kivy.uix.screenmanager.FadeTransition
+#:import random random.random
+#:import Factory kivy.factory.Factory
+#:import os os
+#:import coalesce functions.coalesce
+
+<PopupAddSongToPlaylist>:
+    id: pop
+    size_hint: .8, .6
+    auto_dismiss: True
+    title: 'Playlists'
+    title_align: 'center'
+    BoxLayout:
+        orientation: 'vertical'
+        Widget: 
+            size_hint: 1, None
+            height: dp(10)
+        Label:
+            id: song_name
+            size_hint: 1, None
+            #height: dp(30)
+            text_size: root.width-root.width*.1, None
+            size: self.texture_size
+            halign: 'center'
+            text: root.song_name
+
+        Widget: 
+            size_hint: 1, None
+            height: dp(10)
+
+        PopupAddSongToPlaylistRV:
+            id: popup_rv
+            canvas.before:
+                Color:
+                    #rgba: .1, .1, .1, 1
+                    rgba: .05, .05, .05, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            ScrollView:
+                id: sv
+                do_scroll_x: False
+                do_scroll_y: True
+                scroll_type: ['bars', 'content']
+                bar_width: app.bar_width/2
+                bar_color: 1, 1, 1, .4
+                bar_inactive_color: 1, 1, 1, .1
+                #scroll_wheel_distance: 0
+                StackLayout:
+                    size_hint_y: None
+                    height: self.minimum_height
+                    orientation: 'lr-tb'
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1, None
+            height: dp(30)
+            ButtonLabel:
+                #size_hint: None, 1
+                #width: self.texture_size[0] + (self.texture_size[0]/1.5)
+                text: 'Create New Playlist'
+                #on_release: Factory.PopupCreatePlaylist(do_before_dismiss_callback=(root.show_playlists)).open()
+                on_release: root.open_create_empty_playlist_popup()
+            ButtonLabel:
+                text: 'Close'
+                on_release: root.dismiss()
+
+
+<PopupAddSongToPlaylistItem>:
+    orientation: 'horizontal'
+    size_hint: 1, None
+    height: dp(50)
+    ax: 'left'
+
+    canvas.before:
+        Color:
+            rgba: (.14, .14, .14, 1) if self.mouse_over else (.12, .12, .12, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        Color:
+            rgba: .05, .05, .05, 1
+        #Line:
+        #    points: self.x, self.y, self.width, self.y
+        Line:
+            points: self.x, self.y+self.height-1, self.width, self.y+self.height-1
+    Widget: # padding
+        size_hint: None, 1
+        width: dp(10)
+    BoxLayout: 
+        orientation: 'vertical'
+        AnchorLayout:
+            anchor_x: root.ax
+            size_hint: 1, .6
+            Label:
+                id: playlist_name
+                size_hint: None, None
+                #width: self.texture_size[0]
+                size: self.texture_size
+                text: root.playlist_name
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1, .4
+            AnchorLayout:
+                anchor_x: root.ax
+                anchor_y: 'top'
+                Label:
+                    id: counts
+                    size_hint: None, None
+                    size: self.texture_size
+                    font_size: sp(10)
+                    text: "Songs: " + str(root.songs_total)
+            AnchorLayout:
+                anchor_x: root.ax
+                anchor_y: 'top'
+                Label:
+                    id: counts
+                    size_hint: None, None
+                    size: self.texture_size
+                    font_size: sp(10)
+                    text: "This song: " + str(root.song_count)
+
+    AnchorLayout:
+        anchor_x: 'center'
+        anchor_y: 'center'
+        size_hint: None, 1
+        width: self.height
+        ButtonLabel:
+            size_hint: None, None
+            width: self.parent.width*.7
+            height: self.width
+            r: self.height*0.5
+            canvas.before:
+                Color:
+                    rgba: (.3, .6, .6, 1) if self.mouse_over else (.3, .3, .3, 1)
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [(self.r, self.r), (self.r, self.r), (self.r, self.r), (self.r, self.r)]
+            text: '+'
+            on_release: root.playlist_add()
+
+    
+
+<PopupLoadPlaylist>:
+    id: pop
+    size_hint: .8, .6
+    auto_dismiss: True
+    title: 'Playlists'
+    title_align: 'center'
+    BoxLayout:
+        orientation: 'vertical'
+        Widget: 
+            size_hint: 1, None
+            height: dp(10)
+
+        Widget: 
+            size_hint: 1, None
+            height: dp(10)
+
+        ScrollView:
+            id: sv
+            do_scroll_x: False
+            do_scroll_y: True
+            scroll_type: ['bars', 'content']
+            bar_width: app.bar_width/2
+            bar_color: 1, 1, 1, .4
+            bar_inactive_color: 1, 1, 1, .1
+            StackLayout:
+                size_hint_y: None
+                height: self.minimum_height
+                orientation: 'lr-tb'
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1, None
+            height: dp(30)
+            ButtonLabel:
+                text: 'Close'
+                on_release: root.dismiss()
+
+
+<PopupDirChooser>:
+    size_hint: .8, .8
+    auto_dismiss: True
+    #title: fc.selection[0] if hasattr(fc, 'selection') and len(fc.selection)>0 else app.root.ids.settings_screen.browse_dir
+    #title: root.selection or fc.path
+    
+    BoxLayout:
+        orientation: 'vertical'
+
+        FileChooser:
+            id: fc
+            path: root.path
+            #height: dp(root.height*0.3) if label_playlists_path.toggle else dp(0)
+            dirselect: True
+            #on_selection: root.selection = self.selection and self.selection[0] or ''
+            on_selection: root.on_selection()
+            #selection: root.selection
+            filters: ['']
+            #FileChooserIconLayout
+            FileChooserListLayout
+
+        Button:
+            #disabled: False if hasattr(fc, 'selection') and len(fc.selection)>0 else True
+            size_hint: 1, None
+            height: dp(30)
+            text: 'Select'
+            on_release: root.select()
+
+
+<PopupCreatePlaylist>:
+    playlist_name: input_playlist_name.text
+    #size_hint: .8, .8
+    size_hint: .8, None
+    height: box.minimum_height + dp(20)
+    auto_dismiss: False
+    title: 'Playlist name:'
+
+    BoxLayout:
+        id: box
+        orientation: 'vertical'
+        Label:
+            size_hint: 1, None
+            height: dp(30)
+            text: ''
+        TextInput:
+            size_hint: 1, None
+            height: dp(30)
+            id: input_playlist_name
+            multiline: False
+            text: root.playlist_name
+            on_text: root.set_playlist_name()
+        BoxLayout: 
+            size_hint: 1, None
+            height: dp(30)
+            orientation: 'horizontal'
+            ButtonLabel:
+                text: 'Cancel'
+                on_release: root.cancel()
+            ButtonLabel:
+                text: 'Create'
+                on_release: root.create()

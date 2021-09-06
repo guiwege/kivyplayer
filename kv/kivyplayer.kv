@@ -1,0 +1,27 @@
+
+#:import FadeTransition kivy.uix.screenmanager.FadeTransition
+#:import random random.random
+#:import Factory kivy.factory.Factory
+#:import os os
+
+MyScreenManager:
+    id: sm
+    transition: FadeTransition()
+    FirstScreen:
+        id: first_screen
+    SettingsScreen:
+        id: settings_screen
+
+
+<SelectableLabel>:
+    canvas.before:
+        Color:
+            rgba: (.0, 0.1, .9, .3) if self.selected else (0, 0, 0, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    text_size: (self.width, dp(16))
+    font_size: sp(14)
+    color: (1, 1, 1, 1) if self.selected else (0, .9, .1, 1)
+
+    

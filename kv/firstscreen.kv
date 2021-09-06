@@ -1,0 +1,119 @@
+#:import FadeTransition kivy.uix.screenmanager.FadeTransition
+#:import random random.random
+#:import Factory kivy.factory.Factory
+#:import os os
+
+<FirstScreen>:
+    name: 'first'
+    FloatLayout:
+        BoxLayout:
+            orientation: 'vertical'
+            canvas:
+                Color:
+                    rgba: .1, .1, .1, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint: 1, None
+                height: dp(100)
+                Label:
+                    id: bouncing_label
+                    text: ''
+                    #font_name: 'fonts/GothamBook.ttf'
+                    font_size: sp(16)
+                    #height: dp(30)
+
+                BoxLayout:
+                    orientation: 'horizontal'
+                    Slider:
+                        id: time_elapsed_slider
+                        min: 0
+                        max: 1
+                        value: 0
+                        step: 0.01
+                        cursor_size: (sp(20), sp(20))
+                        cursor_image: 'slider_cursor.png'
+                        background_horizontal: 'sliderh_background.png'
+                        value_track: True
+                        value_track_color: 1, 1, 1, .8
+                        value_track_width: dp(2)
+                        orientation: 'horizontal'
+                        #on_value: app.time_elapsed_slider_on_value() # bind made in the code
+                        #on_touch_up: app.time_elapsed_slider_on_touch_up()
+                        #on_touch_down: app.time_elapsed_slider_on_touch_down()
+
+            BoxLayout:
+                orientation: 'horizontal'
+                size_hint: 1, None
+                height: dp(30)
+                Label:
+                    text: app.song_time_elapsed
+                    size_hint: .15, 1
+                ButtonLabel:
+                    text: '[   ]'
+                    on_release: app.song_stop()
+                    size_hint: .15, 1
+                ButtonLabel:
+                    text: '<<'
+                    size_hint: .10, 1
+                    on_release: app.song_prev()
+                ButtonLabel:
+                    text: '>'
+                    size_hint: .10, 1
+                    on_release: app.song_play()
+                ButtonLabel:
+                    text: '>>'
+                    size_hint: .10, 1
+                    on_release: app.song_next()
+                #ButtonLabelShuffle:
+                ButtonLabelToggle:
+                    id: shuffle_button
+                    text: 'X'
+                    size_hint: .10, 1
+                Slider:
+                    id: volume_slider
+                    size_hint: .20, 1
+                    min: 0.0
+                    max: 0.1
+                    step: 0.001
+                    value: app.volume
+                    on_value: app.on_volume_value()
+                    cursor_size: (sp(20), sp(20))
+                    cursor_image: 'slider_cursor.png'
+                    background_horizontal: 'sliderh_background.png'
+                    orientation: 'horizontal'
+
+            Label:
+                text: 'Playlist'
+                size_hint: 1, None
+                height: dp(30)
+
+            RVPlaylist:
+                id: rv
+
+            BoxLayout:
+                orientation: 'horizontal'
+                size_hint: 1, None
+                height: dp(30)
+                ButtonLabel:
+                    text: 'Load dir'
+                    #on_press: app.load_from_dir_open_popup(app.root.ids.settings_screen.browse_dir)
+                    #on_press: Factory.PopupDirChooser(app.load_songs_from_dir, path=app.root.ids.settings_screen.browse_dir).open()
+                    on_press: root.open_popup_dir_chooser()
+                ButtonLabel:
+                    text: 'Clear'
+                    on_press: app.songs_clear()
+                ButtonLabel:
+                    text: 'Load PL'
+                    on_press: root.open_popup_load_playlist()
+                ButtonLabel:
+                    text: 'Save to PL'
+                    on_press: root.open_popup_save_to_playlist()
+                ButtonLabel:
+                    text: 'Settings'
+                    on_press: app.goto_settings_screen()
+            
+

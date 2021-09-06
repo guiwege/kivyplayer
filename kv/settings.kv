@@ -1,0 +1,104 @@
+
+#:import FadeTransition kivy.uix.screenmanager.FadeTransition
+#:import random random.random
+#:import Factory kivy.factory.Factory
+#:import os os
+
+<SettingsScreen>:
+    bg_color: (.1, .1, .1, 1)
+    name: 'settings'
+    BoxLayout:
+        canvas:
+            Color:
+                rgba: root.bg_color
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        orientation: 'vertical'
+        Label:
+            text: 'Settings'
+            size_hint: 1, None
+            height: dp(30)
+
+        ScrollView:
+            id: sv
+            do_scroll_x: False
+            do_scroll_y: True
+            scroll_type: ['bars', 'content']
+            bar_width: app.bar_width/2
+            bar_color: 1, 1, 1, .4
+            bar_inactive_color: 1, 1, 1, .1
+            #scroll_wheel_distance: 0
+
+            StackLayout:
+                size_hint_y: None
+                height: self.minimum_height
+                orientation: 'lr-tb'
+
+                Label:
+                    id: label_playlists_path
+                    size_hint: 1, None
+                    height: dp(30)
+                    text: 'Playlists directory'
+
+                RelativeLayout:
+                    size_hint: 1, None
+                    height: dp(30)
+                    Label:
+                        id: text_playlists_path
+                        text: root.playlists_dir
+                        size_hint: None, None
+                        height: dp(30)
+                        width: self.texture_size[0]
+                        
+                    Widget:
+                        canvas.before:
+                            Color:
+                                rgba: root.bg_color
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                        size_hint: None, None
+                        height: dp(30)
+                        width: text_playlists_path.width
+                        x: self.parent.width - self.width
+
+                    ButtonLabel:
+                        id: text_playlists_path
+                        #parent_scrollview: sv
+                        text: 'Edit'
+                        size_hint: None, None
+                        height: dp(30)
+                        width: self.texture_size[0] + self.texture_size[0]/2
+                        x: self.parent.width - self.width
+                        #on_release: Factory.PopupDirChooser(root.set_playlists_dir, path=root.playlists_dir).open()
+                        on_release: root.open_popup_dir_chooser()
+                        on_press: print(self.pos)
+                        
+                BoxLayout:
+                    size_hint: 1, None
+                    height: dp(30)
+                    orientation: 'horizontal'
+                    Label:
+                        #parent_scrollview: sv
+                        text: 'Follow playing song'
+                        size_hint: None, None
+                        height: dp(30)
+                        width: self.texture_size[0]
+                        
+                    Widget: #Filler
+                    CheckBox:
+                        id: follow_checkbox
+                        size_hint: None, 1
+                        width: dp(30)
+                        active: False
+
+        ButtonLabel:
+            size_hint: 1, None
+            height: dp(30)
+            text: 'Back'
+            font_size: sp(16)
+            on_release: app.goto_first_screen()
+            on_press: print(self.pos)
+
+

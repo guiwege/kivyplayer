@@ -1,0 +1,197 @@
+
+<RVPlaylist>:
+    canvas.before:
+        Color:
+            rgba: .02, .02, .02, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    viewclass: 'RVPlaylistItemNew'
+    scroll_type: ['bars']
+    bar_width: app.bar_width
+    bar_color: 1, 1, 1, .5
+    bar_inactive_color: 1, 1, 1, .2
+    SelectableRecycleBoxLayout:
+        id: controller
+        #default_size: None, app.playlist_item_height # Precisa ser o mesmo da <SelectableLabel>
+        default_size: None, dp(50)
+        default_size_hint: 1, None
+        size_hint_y: None
+        size_hint_x: 1
+        height: self.minimum_height
+        orientation: 'vertical'
+        multiselect: False
+        touch_multiselect: False
+        spacing: 2
+
+
+
+
+
+
+
+
+
+
+<RVPlaylistItemNew>:
+    size_hint: 1, None
+    height: dp(50)
+    ax: 'left'
+    Widget:
+        canvas:
+            Color:
+                rgba: (.0, 0.03, .3, 1) if root.selected else (.0, 0.015, .15, 1) if root.mouse_over else (.02, .02, .02, 1)
+            Rectangle:
+                pos: self.pos
+                size: self.size
+    BoxLayout:
+        orientation: 'horizontal'
+
+        Widget: # padding
+            size_hint: None, 1
+            width: dp(10)
+        BoxLayout: 
+            orientation: 'vertical'
+            AnchorLayout:
+                anchor_x: root.ax
+                size_hint: 1, .6
+                Label:
+                    id: playlist_name
+                    size_hint: None, None
+                    #width: self.texture_size[0]
+                    size: self.texture_size
+                    text: root.song.file_name if root.song else ''
+                    color: (1, 1, 1, .9) if root.selected or root.mouse_over else (0, .9, .1, 1)
+            AnchorLayout:
+                anchor_x: root.ax
+                anchor_y: 'top'
+                size_hint: 1, .4
+                Label:
+                    id: playlist_name
+                    size_hint: None, None
+                    #width: self.texture_size[0]
+                    size: self.texture_size
+                    font_size: sp(11)
+                    text: root.song.dir_name if root.song else ''
+                    color: (1, 1, 1, .9) if root.selected or root.mouse_over else (0, .9, .1, 1)
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: None, 1
+            width: self.minimum_width
+            canvas:
+                Color:
+                    rgba: (.0, 0.03, .3, 1) if root.selected else (.0, 0.015, .15, 1) if root.mouse_over else (.02, .02, .02, 1)
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            AnchorLayout:
+                size_hint: None, 1
+                width: dp(30)
+                anchor_x: 'center'
+                anchor_y: 'center'
+                ButtonLabel:
+                    size_hint: None, None
+                    width: self.parent.width*1
+                    height: self.width
+                    r: self.height*0.5
+                    canvas.before:
+                        Color:
+                            rgba: (.3, .8, .8, 1) if self.mouse_over else (.3, .3, .3, 1)
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [(self.r, self.r), (self.r, self.r), (self.r, self.r), (self.r, self.r)]
+                    text: '-'
+                    color: (0, 0, 0, 1) if self.mouse_over else (1, 1, 1, .9)
+                    on_release: app.song_remove(root.index)
+            Widget:
+                size_hint: None, 1
+                width: dp(2)
+            AnchorLayout:
+                size_hint: None, 1
+                width: dp(30)
+                anchor_x: 'center'
+                anchor_y: 'center'
+                ButtonLabel:
+                    size_hint: None, None
+                    width: self.parent.width*1
+                    height: self.width
+                    r: self.height*0.5
+                    canvas.before:
+                        Color:
+                            rgba: (.3, .8, .8, 1) if self.mouse_over else (.3, .3, .3, 1)
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [(self.r, self.r), (self.r, self.r), (self.r, self.r), (self.r, self.r)]
+                    text: '+'
+                    color: (0, 0, 0, 1) if self.mouse_over else (1, 1, 1, .9)
+                    on_release: root.open_popup_add_song_to_playlist()
+            Widget:
+                size_hint: None, 1
+                width: app.bar_width + dp(2)
+
+<RVPlaylistItem>:
+    size_hint: 1, None
+    height: app.playlist_item_height
+    Widget: # highlight
+        canvas:
+            Color:
+                rgba: (.0, 0.1, .9, .3) if self.parent.selected else (0, 0, 0, 0)
+            Rectangle:
+                pos: self.pos
+                size: self.size
+    Label:
+        text: self.parent.text
+        font_size: sp(app.playlist_item_height)
+        size_hint: None, 1
+        size: self.texture_size
+        color: (1, 1, 1, 1) if self.parent.selected else (0, .9, .1, 1)
+    
+    ButtonLabelAddSongToPlaylist:
+        canvas.before:
+            Color:
+                rgba: (0, 0, 0, 1)
+            Rectangle:
+                pos: self.pos
+                size: (self.parent.width - self.x, self.size[1])
+            Color:
+                rgba: (.0, 0.1, .9, .3) if self.parent.selected else (0, 0, 0, 0)
+            Rectangle:
+                pos: self.pos
+                size: (self.size[0]*2, self.size[1])
+
+        text: '[ - ] ' if not self.parent.text == '' else ''
+        font_size: sp(app.playlist_item_height)
+        size_hint: None, 1
+        size: self.texture_size
+        color: (1, 1, 1, 1) if self.parent.selected else (0, .9, .1, 1)
+        x: self.parent.width - (self.texture_size[0]*2) - app.bar_width
+        on_press: app.song_remove(root.index)
+
+    ButtonLabelAddSongToPlaylist:
+        canvas.before:
+            Color:
+                rgba: (0, 0, 0, 1)
+            Rectangle:
+                pos: self.pos
+                size: (self.parent.width - self.x, self.size[1])
+            Color:
+                rgba: (.0, 0.1, .9, .3) if self.parent.selected else (0, 0, 0, 0)
+            Rectangle:
+                pos: self.pos
+                size: (self.size[0]*2, self.size[1])
+
+        text: '[ + ]' if not self.parent.text == '' else ''
+        font_size: sp(app.playlist_item_height)
+        size_hint: None, 1
+        size: self.texture_size
+        color: (1, 1, 1, 1) if self.parent.selected else (0, .9, .1, 1)
+        x: self.parent.width - self.width - app.bar_width
+        #on_release: print(root)
+        #on_release: Factory.PopupAddSongToPlaylist(song=root.song).open()
+        on_release: root.open_popup_add_song_to_playlist()
+
+
+
