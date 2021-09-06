@@ -2,7 +2,7 @@
 <RVPlaylist>:
     canvas.before:
         Color:
-            rgba: .02, .02, .02, 1
+            rgba: .1, .1, .1, 1
         Rectangle:
             pos: self.pos
             size: self.size
@@ -61,7 +61,7 @@
                     #width: self.texture_size[0]
                     size: self.texture_size
                     text: root.song.file_name if root.song else ''
-                    color: (1, 1, 1, .9) if root.selected or root.mouse_over else (0, .9, .1, 1)
+                    color: (1, 1, 1, 1) if root.selected or root.mouse_over else (0, .9, .1, 1)
             AnchorLayout:
                 anchor_x: root.ax
                 anchor_y: 'top'
@@ -73,7 +73,7 @@
                     size: self.texture_size
                     font_size: sp(11)
                     text: root.song.dir_name if root.song else ''
-                    color: (1, 1, 1, .9) if root.selected or root.mouse_over else (0, .9, .1, 1)
+                    color: (1, 1, 1, 1) if root.selected or root.mouse_over else (0, .9, .1, 1)
         BoxLayout:
             orientation: 'horizontal'
             size_hint: None, 1
@@ -97,13 +97,16 @@
                     r: self.height*0.5
                     canvas.before:
                         Color:
-                            rgba: (.3, .8, .8, 1) if self.mouse_over else (.3, .3, .3, 1)
+                            rgba: (.2, .2, .2, 2) if self.mouse_over else (0, 0, 0, 0)
                         RoundedRectangle:
                             pos: self.pos
                             size: self.size
                             radius: [(self.r, self.r), (self.r, self.r), (self.r, self.r), (self.r, self.r)]
-                    text: '-'
-                    color: (0, 0, 0, 1) if self.mouse_over else (1, 1, 1, .9)
+                    #text: '-'
+                    #color: (0, 0, 0, 1) if self.mouse_over else (1, 1, 1, 1)
+                    text: '\u2716'
+                    font_name: "DejaVuSans.ttf"
+                    color: (1, 1, 1, 1) if self.mouse_over else (.6, .6, .6, 1)
                     on_release: app.song_remove(root.index)
             Widget:
                 size_hint: None, 1
@@ -120,13 +123,14 @@
                     r: self.height*0.5
                     canvas.before:
                         Color:
-                            rgba: (.3, .8, .8, 1) if self.mouse_over else (.3, .3, .3, 1)
+                            rgba: (.8, 0, 0, 1) if self.mouse_over else (.3, .3, .3, 0)
                         RoundedRectangle:
                             pos: self.pos
                             size: self.size
                             radius: [(self.r, self.r), (self.r, self.r), (self.r, self.r), (self.r, self.r)]
-                    text: '+'
-                    color: (0, 0, 0, 1) if self.mouse_over else (1, 1, 1, .9)
+                    text: '\u2764'
+                    font_name: "DejaVuSans.ttf"
+                    color: (1, 1, 1, 1) if self.mouse_over else (.6, .6, .6, 1)
                     on_release: root.open_popup_add_song_to_playlist()
             Widget:
                 size_hint: None, 1

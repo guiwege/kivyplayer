@@ -19,12 +19,14 @@
                 orientation: 'vertical'
                 size_hint: 1, None
                 height: dp(100)
-                Label:
-                    id: bouncing_label
-                    text: ''
-                    #font_name: 'fonts/GothamBook.ttf'
-                    font_size: sp(16)
-                    #height: dp(30)
+                RelativeLayout:
+                    ButtonLabel:
+                        orientation: 'horizontal'
+                        on_release: app.scroll_to_playing()
+                    Label:
+                        id: bouncing_label
+                        text: ''
+                        font_size: sp(16)
 
                 BoxLayout:
                     orientation: 'horizontal'
@@ -53,19 +55,27 @@
                     text: app.song_time_elapsed
                     size_hint: .15, 1
                 ButtonLabel:
-                    text: '[   ]'
+                    text: '\u25fc'
+                    font_name: "DejaVuSans.ttf"
+                    #text: '[   ]'
                     on_release: app.song_stop()
                     size_hint: .15, 1
                 ButtonLabel:
-                    text: '<<'
+                    text: '\u25c2\u25c2'
+                    font_name: "DejaVuSans.ttf"
+                    #text: '<<'
                     size_hint: .10, 1
                     on_release: app.song_prev()
                 ButtonLabel:
-                    text: '>'
+                    text: '\u25b6'
+                    font_name: "DejaVuSans.ttf"
+                    #text: '>'
                     size_hint: .10, 1
                     on_release: app.song_play()
                 ButtonLabel:
-                    text: '>>'
+                    text: '\u25b8\u25b8'
+                    font_name: "DejaVuSans.ttf"
+                    #text: '>>'
                     size_hint: .10, 1
                     on_release: app.song_next()
                 #ButtonLabelShuffle:

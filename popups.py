@@ -112,6 +112,7 @@ class PopupAddSongToPlaylistItem(BoxLayout, MouseOverBehavior):
                     playlist_out.write(file + '\n')
         
         self.song_count += 1
+        self.songs_total += 1
         self.working = False
 
     def playlist_remove(self):
@@ -158,7 +159,7 @@ class PopupLoadPlaylist(Popup):
                 ext = ext.lower()
                 if ext=='.playlist':
                     #print(fname)
-                    item = ButtonLabel(text=fname, size_hint=(1, None), height=dp(50))
+                    item = ButtonLabel(text=fname.title(), size_hint=(1, None), height=dp(50))
                     item.bind(on_release=partial(app.load_songs_from_playlist, fileabs))
                     item.bind(on_release=self.dismiss)
                     self.ids.sv.children[0].add_widget(item)

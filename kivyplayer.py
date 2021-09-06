@@ -112,6 +112,8 @@ class KivyPlayerApp(App):
     bar_width = dp(20)
     playlist_item_height = dp(50)
 
+    last_click = ObjectProperty((-999, 0)) #(index, time.time())
+
     #on_mouse_over_widgets = ListProperty([])
     #mouse_pos = None
 
@@ -152,7 +154,7 @@ class KivyPlayerApp(App):
                 playlists_dir=os.getcwd(),
                 shuffle=False,
                 follow=False,
-                max_file_size_mb=10)
+                max_file_size_MB_mb=10)
 
         self.volume = self.store.get('general')['volume']
         self.root.ids.first_screen.ids.shuffle_button.toggle = self.store.get('general')['shuffle']
@@ -162,6 +164,24 @@ class KivyPlayerApp(App):
         self.root.ids.first_screen.ids.shuffle_button.bind(toggle=self.on_shuffle)
         self.root.ids.settings_screen.ids.follow_checkbox.bind(active=self.on_follow)
         #self.load_songs_from_dir(r"F:\Musicas Game OSTs")
+
+    def check_double_click_song(self, index):
+        new_time = time.time()
+        new_index = index
+        last_index, last_time = self.last_click
+
+        if last_index == new_index and new_time-last_time<=0.2:
+            self.last_click = (new_index, new_time)
+            self.last_click = (-999, 0)
+            self.song_play()
+        
+        print('last_click:', last_time, 'new_click:', (new_index, new_time), 'delta:', new_time-self.last_click[1])
+        self.last_click = (new_index, new_time)
+        
+
+
+    
+
 
     def on_mouse_pos(self, window, pos):
         #print(pos)
@@ -264,28 +284,31 @@ class KivyPlayerApp(App):
             self.soundLoader.unbind(on_stop=self.on_song_finish)
             self.soundLoader.unload()
         
-        file_size = os.stat(song.file_path).st_size/1024/1024
+        try:
+            file_size_MB = os.stat(song.file_path).st_size/1024/1024
 
-        print('file_size', file_size)
-        if file_size <= 10:
-            self.soundLoader = SoundLoader.load(song.file_path)
-            self.soundLoader.volume = self.volume
+            print('file_size_MB', file_size_MB)
+            if file_size_MB <= 10:
+                self.soundLoader = SoundLoader.load(song.file_path)
+                self.soundLoader.volume = self.volume
 
-            print('Playing:', 'index:', index, song.file_path)
-            self.soundLoader.bind(on_stop=self.on_song_finish)
-            
-            self.soundLoader.play()
-            self.song_secs_elapsed = 0
-            sl.value = 0
-            # Set playing label
-            self.root.ids.first_screen.ids.bouncing_label.text = f"{song.dir_name} - {song.display_name}"
-            #sl.max = self.soundLoader.length
-            self.played_songs.append(song.file_path)
-
-            if self.is_follow():
-                self.scroll_to_playing()
+                print('Playing:', 'index:', index, song.file_path)
+                self.soundLoader.bind(on_stop=self.on_song_finish)
                 
-        else:
+                self.soundLoader.play()
+                self.song_secs_elapsed = 0
+                sl.value = 0
+                # Set playing label
+                self.root.ids.first_screen.ids.bouncing_label.text = f"{song.dir_name} - {song.display_name}"
+                #sl.max = self.soundLoader.length
+                self.played_songs.append(song.file_path)
+
+                if self.is_follow():
+                    self.scroll_to_playing()
+            else:
+                raise Exception(f'ERROR: File bigger than 10MB: {file_size_MB}MB')
+        except Exception as e:
+            print(str(e))
             Clock.schedule_once(self.song_next, 1)
             
         Clock.schedule_once(partial(rv.highlight_index, self.selected_index))
@@ -422,7 +445,9 @@ class KivyPlayerApp(App):
 
         #new_data.append({'index': len(new_data), 'text': '', 'song': None})
         rv.data = new_data
-        rv.scroll_y = scroll_y
+
+        single_item_perc = 1.0/len(self.default_playlist)
+        rv.scroll_y = scroll_y + single_item_perc
         
         Clock.schedule_once(partial(rv.highlight_index, index))
 
@@ -507,7 +532,7 @@ class KivyPlayerApp(App):
                     i += 1
 
         #rv.data = [{'index': index, 'text': f'{index}. {" - ".join([song.dir_name, song.display_name])}', 'song': song} for index, song in self.default_playlist]
-        rv.data.append({'index': len(rv.data), 'text': '', 'song': None})
+        #rv.data.append({'index': len(rv.data), 'text': '', 'song': None})
         
         self.scroll_to_playing()
 

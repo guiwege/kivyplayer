@@ -132,14 +132,17 @@
             width: self.parent.width*.7
             height: self.width
             r: self.height*0.5
+            
             canvas.before:
                 Color:
-                    rgba: (.3, .6, .6, 1) if self.mouse_over else (.3, .3, .3, 1)
+                    rgba: (.8, 0, 0, 1) if self.mouse_over else (.3, .3, .3, 0)
                 RoundedRectangle:
                     pos: self.pos
                     size: self.size
                     radius: [(self.r, self.r), (self.r, self.r), (self.r, self.r), (self.r, self.r)]
-            text: '+'
+            text: '\u2764'
+            font_name: "DejaVuSans.ttf"
+            color: (1, 1, 1, 1) if self.mouse_over else (.6, .6, .6, 1)
             on_release: root.playlist_add()
 
     
