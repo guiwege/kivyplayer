@@ -46,10 +46,21 @@
                 size: self.size
     BoxLayout:
         orientation: 'horizontal'
-
-        Widget: # padding
+        AnchorLayout:
             size_hint: None, 1
-            width: dp(10)
+            #width: self.minimum_width #dp(10)
+            width: index.width
+            anchor_x: 'center'
+            anchor_y: 'center'
+            Label:
+                id: index
+                size_hint: None, None
+                text: str(root.index+1).zfill(len(str(len(app.default_playlist)))) + '.'
+                font_size: 9
+                color: (1, 1, 1, 1) if root.selected or root.mouse_over else (0, .9, .1, 1)
+                width: self.texture_size[0] + dp(8)
+                height: self.texture_size[1]
+
         BoxLayout: 
             orientation: 'vertical'
             AnchorLayout:
@@ -72,7 +83,7 @@
                     #width: self.texture_size[0]
                     size: self.texture_size
                     font_size: sp(11)
-                    text: root.song.dir_name if root.song else ''
+                    text:  root.song.dir_name if root.song else ''
                     color: (1, 1, 1, 1) if root.selected or root.mouse_over else (0, .9, .1, 1)
         BoxLayout:
             orientation: 'horizontal'
@@ -135,6 +146,12 @@
             Widget:
                 size_hint: None, 1
                 width: app.bar_width + dp(2)
+                canvas.before:
+                    Color:
+                        rgba: (.08, .08, .08, 1)
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
 
 <RVPlaylistItem>:
     size_hint: 1, None

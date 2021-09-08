@@ -79,7 +79,7 @@ class RVPlaylist(RecycleView):
 
 class RVPlaylistItemNew(RecycleDataViewBehavior, MouseOverBehavior, RelativeLayout):
     ''' Add selection support to the Label '''
-    index = None
+    index = NumericProperty(0)
     selected = BooleanProperty(True)
     selectable = BooleanProperty(True)
     text = StringProperty('')

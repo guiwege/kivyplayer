@@ -6,6 +6,7 @@
 <FirstScreen>:
     name: 'first'
     FloatLayout:
+
         BoxLayout:
             orientation: 'vertical'
             canvas:
@@ -18,15 +19,29 @@
             BoxLayout:
                 orientation: 'vertical'
                 size_hint: 1, None
-                height: dp(100)
+                #height: dp(100)
+                #height: self.minimum_height
+                height: bouncing_label.height
+                
                 RelativeLayout:
                     ButtonLabel:
                         orientation: 'horizontal'
                         on_release: app.scroll_to_playing()
                     Label:
+                        size_hint: 1, None
+                        height: dp(30)
                         id: bouncing_label
                         text: ''
                         font_size: sp(16)
+
+            RVPlaylist:
+                id: rv
+
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint: 1, None
+                height: dp(30)
+                
 
                 BoxLayout:
                     orientation: 'horizontal'
@@ -43,9 +58,6 @@
                         value_track_color: 1, 1, 1, .8
                         value_track_width: dp(2)
                         orientation: 'horizontal'
-                        #on_value: app.time_elapsed_slider_on_value() # bind made in the code
-                        #on_touch_up: app.time_elapsed_slider_on_touch_up()
-                        #on_touch_down: app.time_elapsed_slider_on_touch_down()
 
             BoxLayout:
                 orientation: 'horizontal'
@@ -98,11 +110,7 @@
                                 pos: self.pos
                                 size: self.size
                                 source: 'icons/shuffle_2.png'
-                    #ButtonImageToggle:
-                    #    id: shuffle_button
-                    #    size_hint: None, None
-                    #    size: (20, 20)
-                    #    source: 'icons/shuffle_2.png'
+
                 Slider:
                     id: volume_slider
                     size_hint: .20, 1
@@ -116,13 +124,6 @@
                     background_horizontal: 'sliderh_background.png'
                     orientation: 'horizontal'
 
-            Label:
-                text: 'Playlist'
-                size_hint: 1, None
-                height: dp(30)
-
-            RVPlaylist:
-                id: rv
 
             BoxLayout:
                 orientation: 'horizontal'

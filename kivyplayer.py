@@ -5,6 +5,7 @@ import random
 import re
 import math
 import codecs
+
 from kivy.app import App
 from kivy.base import runTouchApp
 from kivy.lang import Builder
@@ -32,7 +33,7 @@ from kivy.uix.popup import Popup
 from random import randint
 from functools import partial, singledispatch
 from datetime import datetime
-
+from pynput.keyboard import Listener
 from recycleviews import RVPlaylist, RVPlaylistItem
 from popups import PopupAddSongToPlaylist, PopupDirChooser, PopupCreatePlaylist, PopupLoadPlaylist
 from song import Song
@@ -42,9 +43,13 @@ from behaviors import MouseOverBehavior
 # icons
 # C:\Users\gui\kivy_venv\Lib\site-packages\kivy\tools\theming\defaulttheme
 
-# ffpyplayer
+# ffpyplayer (nao utilizado)
 # c:\Users\gui\kivy_venv\Scripts\activate
 # python -m pip install ffpyplayer
+
+# pynput (utilizado)
+# c:\Users\gui\kivy_venv\Scripts\activate
+# python -m pip install pynput
 
 class FirstScreen(Screen):
     def open_popup_dir_chooser(self):
@@ -109,7 +114,7 @@ class KivyPlayerApp(App):
 
     volume = NumericProperty(0.01)
     
-    bar_width = dp(20)
+    bar_width = dp(10)
     playlist_item_height = dp(50)
 
     last_click = ObjectProperty((-999, 0)) #(index, time.time())
