@@ -2,7 +2,7 @@
 
 from kivy.app import App
 from kivy.uix.label import Label
-from kivy.uix.image import Image  
+from kivy.uix.image import Image, AsyncImage
 from kivy.properties import ListProperty, NumericProperty, BooleanProperty, StringProperty, ObjectProperty
 from kivy.uix.behaviors import ButtonBehavior, CompoundSelectionBehavior
 from behaviors import MouseOverBehavior
@@ -39,3 +39,7 @@ class ButtonImageToggle(ButtonBehavior, MouseOverBehavior, Image):
     def on_release(self, *args):
         self.toggle = not self.toggle
         print(self.toggle)
+
+
+class ButtonAsyncImage(ButtonBehavior, MouseOverBehavior, AsyncImage):
+    pass

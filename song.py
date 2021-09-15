@@ -14,6 +14,11 @@ class Song:
         self.display_name = re.sub(' {2,}', ' ', self.file_name, flags=re.IGNORECASE) # Remove espaços em excesso
         #if not self.dir_name:
         #    self.dir_name = os.path.dirname(file_path)
+
+        self.album_name = self.dir_name
+        self.song_name = self.display_name
+        self.artist_name = ''
+
         
     def __hash__(self):
         return hash((self.file_name, self.file_extension, self.file_path))

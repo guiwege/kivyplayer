@@ -4,11 +4,18 @@
 #:import Factory kivy.factory.Factory
 #:import os os
 
-MyScreenManager:
-    id: sm
-    transition: FadeTransition()
-    FirstScreen:
-        id: first_screen
-    SettingsScreen:
-        id: settings_screen
+RelativeLayout:
+    MyScreenManager:
+        id: sm
+        #size_hint: 1, .8
+        transition: FadeTransition()
+        FirstScreen:
+            id: first_screen
+        SettingsScreen:
+            id: settings_screen
+    
+    FloatLayout:
+        Label: 
+            text: ''#'teste'
+            color: 0, 1, 0, 1
 

@@ -5,16 +5,30 @@ import random
 import re
 import math
 import codecs
-
+from typing import AsyncIterable
+from kivy.core import image
+import requests
+import urllib
+import json
+import requests
+import re
+import sys
+import os
+import http.cookiejar
+import json
+import urllib.request, urllib.error, urllib.parse
+from bs4 import BeautifulSoup
 from kivy.app import App
 from kivy.base import runTouchApp
 from kivy.lang import Builder
+from kivy.loader import Loader
 from kivy.properties import ListProperty, NumericProperty, BooleanProperty, StringProperty, ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from kivy.uix.widget import Widget
+from kivy.uix.image import Image
 from kivy.core.audio import SoundLoader
 from kivy.uix.recycleview import RecycleView
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
@@ -39,6 +53,7 @@ from popups import PopupAddSongToPlaylist, PopupDirChooser, PopupCreatePlaylist,
 from song import Song
 from settings import SettingsScreen
 from behaviors import MouseOverBehavior
+from threading import Thread
 
 # icons
 # C:\Users\gui\kivy_venv\Lib\site-packages\kivy\tools\theming\defaulttheme
@@ -119,6 +134,13 @@ class KivyPlayerApp(App):
 
     last_click = ObjectProperty((-999, 0)) #(index, time.time())
 
+    # Controlls the images shown
+    song_images_display_elapsed = 0.0
+    song_images_display_time = 60 #seconds
+    song_images = ListProperty([]) # loaded from bing when song changes
+    song_images_index = NumericProperty(0)
+    song_images_last_album = ''
+
     #on_mouse_over_widgets = ListProperty([])
     #mouse_pos = None
 
@@ -128,6 +150,8 @@ class KivyPlayerApp(App):
     def build(self):
         Window.size = (469, 700)
         Window.bind(mouse_pos=self.on_mouse_pos)
+        Loader.loading_image = 'icons/black_square.png'
+        Loader.error_image = 'icons/black_square.png'
 
         print(os.path.join(os.path.dirname(__file__)))
         Builder.load_file(os.path.join(os.path.dirname(__file__), r'kv\firstscreen.kv'))
@@ -147,7 +171,6 @@ class KivyPlayerApp(App):
         #Clock.schedule_interval(self.bounce_label, 1/60)
         Clock.schedule_interval(self.song_timer, self.time_tick)
         Clock.schedule_interval(self.update, 1/60)
-        #Clock.schedule_interval(self.update, 1)
 
     def finish_init(self, dt):
         self.store = JsonStore('kivy_settings.json')
@@ -184,10 +207,6 @@ class KivyPlayerApp(App):
         self.last_click = (new_index, new_time)
         
 
-
-    
-
-
     def on_mouse_pos(self, window, pos):
         #print(pos)
         #self.mouse_pos = pos
@@ -217,6 +236,11 @@ class KivyPlayerApp(App):
         except Exception:
             pass
 
+        # song image change
+        self.song_images_display_elapsed += dt
+        if self.song_images_display_elapsed >= self.song_images_display_time:
+            self.change_song_image()
+            
 
     def is_shuffle(self):
         return self.root.ids.first_screen.ids.shuffle_button.toggle
@@ -278,8 +302,10 @@ class KivyPlayerApp(App):
 
         rv = self.root.ids.first_screen.ids.rv
         sl = self.root.ids.first_screen.ids.time_elapsed_slider
-
+        
         index, song = self.default_playlist[self.selected_index]
+        
+        
         # Unload if already playing
         
         # Load selected song file
@@ -310,19 +336,128 @@ class KivyPlayerApp(App):
 
                 if self.is_follow():
                     self.scroll_to_playing()
+                
+                
+                current_album = self.default_playlist[self.selected_index][1].album_name
+                print('current_album:', current_album, 'last_album:', self.song_images_last_album)
+                if not current_album==self.song_images_last_album:
+                    self.song_images_last_album = current_album
+                    Thread(target=partial(self.song_images_load, None)).start()
             else:
-                raise Exception(f'ERROR: File bigger than 10MB: {file_size_MB}MB')
+                raise Exception(f'File bigger than 10MB: {file_size_MB}MB')
         except Exception as e:
-            print(str(e))
+            print('ERROR:', str(e))
             Clock.schedule_once(self.song_next, 1)
             
         Clock.schedule_once(partial(rv.highlight_index, self.selected_index))
             
 
+    def song_images_load(self, *args):
+        def get_soup(url,header):
+            #return BeautifulSoup(urllib2.urlopen(urllib2.Request(url,headers=header)),
+            # 'html.parser')
+            return BeautifulSoup(urllib.request.urlopen(
+                urllib.request.Request(url,headers=header)),
+                'html.parser')
+
+        self.song_images = []
+        self.song_images_index = 0
+        self.song_images_display_elapsed += 0
+        #seartext = input("enter the search term: ")
+        #count = input("Enter the number of images you need:")
+        index, song = self.default_playlist[self.playing_index]
+
+        query = song.album_name + ' gameplay'
+        query= query.split()
+        query='+'.join(query)
+        url="http://www.bing.com/images/search?q=" + query + "&FORM=HDRSC2"
+
+        #add the directory for your image here
+        header={'User-Agent':"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36"}
+        soup = get_soup(url,header)
+
+        ActualImages=[]# contains the link for Large original images, type of  image
+        for a in soup.find_all("a",{"class":"iusc"}):
+            #print a
+            #mad = json.loads(a["mad"])
+            #turl = mad["turl"]
+            #print(a)
+            # mad = json.loads(a["mad"])
+            # turl = mad["turl"]
+            m = json.loads(a["m"])
+            murl = m["murl"]
+            turl = m["turl"]
+
+            image_name = urllib.parse.urlsplit(murl).path.split("/")[-1]
+            #print(image_name)
+
+            print('murl:', murl)
+            ActualImages.append((image_name, turl, murl))
+
+        #print(ActualImages)
+        if ActualImages:
+            self.song_images = [x for _, _, x in ActualImages]
+        
+
+    def song_images_load2(self, *args):
+        self.song_images = []
+        self.song_images_index = 0
+        self.song_images_display_elapsed += 0
+        #seartext = input("enter the search term: ")
+        #count = input("Enter the number of images you need:")
+        index, song = self.default_playlist[self.playing_index]
+        seartext = song.album_name + ' gameplay'
+        print('seartext:', seartext)
+        #adlt = 'off' # can be set to 'moderate'
+        sear=seartext.strip()
+        sear=sear.replace(' ','+')
+        adlt = 'moderate' # can be set to 'moderate'
+        count = 35 # 35 is the limit
+        #URL='https://bing.com/images/search?q=' + sear + '&safeSearch=' + adlt + '&count=' + str(count)
+        #URL='https://bing.com/images/search?q=' + sear + '&form=HDRSC2&first=1&tsc=ImageBasicHover'
+        URL= "http://www.bing.com/images/search?q=" + sear + "&FORM=HDRSC2"
+        print('URL:', URL)
+        #USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:65.0) Gecko/20100101 Firefox/65.0"
+        USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36"
+        headers = {"user-agent": USER_AGENT}
+        resp = requests.get(URL, headers=headers)
+        results=[]
+        soup = BeautifulSoup(resp.content, "html.parser")
+        #print(soup)
+        wow = soup.find_all('a',class_='iusc')
+        n = 0
+        for i in wow:
+            n += 1
+            if n > count: break
+            try:
+                image_url = eval(i['m'])['murl'].replace(' ', '%20').encode('ascii').decode('ascii')
+
+                print('image_url:', image_url, 'type:', type(image_url))
+                #image_url = urllib.parse.quote(image_url)
+                #image_url = re.sub(r'http(s)?\%3A//', r'http\1://', image_url)
+                #print('image_url:', image_url, 'type:', type(image_url))
+                self.song_images.append(image_url)
+            except Exception as e:
+                print("ERROR:", e)
+                #raise Exception(f'{e}')
+
+        if self.song_images:
+            #random.shuffle(self.song_images)
+            print('song_images:', self.song_images)
+
+
+    def change_song_image(self):
+        if self.song_images:
+            if self.song_images_index+1 >= len(self.song_images):
+                self.song_images_index = 0
+            else: self.song_images_index += 1
+            self.song_images_display_elapsed = 0
+            print('loading image:', self.song_images[self.song_images_index])
+
+
     def on_song_finish(self, *args):
         self.song_next()
 
-        
     def song_next(self, *args):
         if not self.default_playlist:
             return
@@ -392,9 +527,10 @@ class KivyPlayerApp(App):
         if self.soundLoader:
             self.soundLoader.unbind(on_stop=self.on_song_finish)
             self.soundLoader.stop()
-            self.root.ids.first_screen.ids.bouncing_label.text = ""
+            self.root.ids.first_screen.ids.bouncing_label.text = ">> NOT PLAYING <<"
             self.song_time_elapsed = '00:00'
             self.song_secs_elapsed
+            self.song_images = []
         
 
     def on_volume_value(self, *args):
@@ -543,10 +679,10 @@ class KivyPlayerApp(App):
 
 
     def goto_settings_screen(self):
-        self.root.current = 'settings'
+        self.root.ids.sm.current = 'settings'
     
     def goto_first_screen(self):
-        self.root.current = 'first'
+        self.root.ids.sm.current = 'first'
 
 if __name__ == '__main__':
     # run loop

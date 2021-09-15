@@ -2,6 +2,8 @@
 #:import random random.random
 #:import Factory kivy.factory.Factory
 #:import os os
+#:import threading threading
+#:import partial functools.partial
 
 <FirstScreen>:
     name: 'first'
@@ -15,6 +17,7 @@
                 Rectangle:
                     pos: self.pos
                     size: self.size
+
 
             BoxLayout:
                 orientation: 'vertical'
@@ -31,11 +34,48 @@
                         size_hint: 1, None
                         height: dp(30)
                         id: bouncing_label
-                        text: ''
+                        text: '>> NOT PLAYING <<'
                         font_size: sp(16)
 
-            RVPlaylist:
-                id: rv
+
+
+            ScreenManager:
+                id: sm
+                transition: FadeTransition()
+                Screen:
+                    name: 'playlist'
+
+                    BoxLayout:
+                        orientation: 'vertical'
+                        
+                        Label:
+                            size_hint: 1, None
+                            height: dp(30)
+                            text: 'Playlist'
+
+                        RVPlaylist:
+                            id: rv
+                Screen:
+                    name: 'album_image'
+                    
+                    BoxLayout:
+                        orientation: 'vertical'
+
+                        #Label:
+                        #    size_hint: 1, None
+                        #    height: dp(30)
+                        #    text: 'Album related art'
+
+                        ButtonAsyncImage:
+                            canvas.before:
+                                Color:
+                                    rgba: 0, 0, 0, 1
+                                Rectangle:
+                                    pos: self.pos
+                                    size: self.size
+                            source: app.song_images[app.song_images_index] if app.song_images else 'icons/black_square.png'
+                            allow_stretch: True
+                            on_release: app.change_song_image()
 
             BoxLayout:
                 orientation: 'vertical'
@@ -146,5 +186,8 @@
                 ButtonLabel:
                     text: 'Settings'
                     on_press: app.goto_settings_screen()
+                ButtonLabel:
+                    text: 'Cinema'
+                    on_release: sm.current = 'album_image' if sm.current=='playlist' else 'playlist'
             
 
