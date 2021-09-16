@@ -210,8 +210,6 @@
         size: self.texture_size
         color: (1, 1, 1, 1) if self.parent.selected else (0, .9, .1, 1)
         x: self.parent.width - self.width - app.bar_width
-        #on_release: print(root)
-        #on_release: Factory.PopupAddSongToPlaylist(song=root.song).open()
         on_release: root.open_popup_add_song_to_playlist()
 
 

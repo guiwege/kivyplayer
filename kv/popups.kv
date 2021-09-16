@@ -193,17 +193,28 @@
     
     BoxLayout:
         orientation: 'vertical'
-
+        AnchorLayout:
+            anchor_x: 'left'
+            anchod_y: 'center'
+            size_hint: 1, None
+            height: dp(30)
+            
+            Label:
+                size_hint: None, None
+                text_size: self.parent.width, self.parent.height
+                width: self.texture_size[0]
+                id: title
+                halign: 'left'
+                shorten: True
+                shorten_from: 'right'
+                strip: True
+                text: ''
         FileChooser:
             id: fc
             path: root.path
-            #height: dp(root.height*0.3) if label_playlists_path.toggle else dp(0)
             dirselect: True
-            #on_selection: root.selection = self.selection and self.selection[0] or ''
             on_selection: root.on_selection()
-            #selection: root.selection
             filters: ['']
-            #FileChooserIconLayout
             FileChooserListLayout
 
         Button:

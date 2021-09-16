@@ -31,6 +31,8 @@ class PopupAddSongToPlaylist(Popup):
     def finish_init(self, dt):
         self.show_playlists()
         
+
+
     def show_playlists(self):
         app = App.get_running_app()
         playlists_dir = app.root.ids.settings_screen.playlists_dir
@@ -175,18 +177,32 @@ class PopupDirChooser(Popup):
         super(PopupDirChooser, self).__init__()
         #self.selection = self.kwargs['path']
         self.path = self.kwargs['path']
-        self.title = self.path
+        #self.title = self.path
+        self.ids.title.text = self.path
+        self.fix_title_size()
         self.selection = self.path
         
     def finish_init(self, dt):
-        self.ids.fc.title = self.ids.fc.path
+        #self.ids.fc.title = self.ids.fc.path
+        self.ids.title.text = self.ids.fc.path
+        pass
 
+    def fix_title_size(self):
+        print(self.width, self.ids.title.texture_size[0])
+        if self.ids.title.text_size[0] > self.width:
+            perc = self.width / self.ids.title.texture_size[0]
+            print(perc)
+                
+        
+        
     def on_selection(self, *args):
         print('selection:', 'args:', args)
         fc = self.ids.fc
         #self.selection = fc.selection and fc.selection[0] or ''
         self.selection = fc.selection[0] if hasattr(fc, 'selection') and len(fc.selection)>0 else ''
-        self.title = self.selection
+        #self.title = self.selection
+        self.ids.title.text = self.selection
+        self.fix_title_size()
 
     def select(self):
         self.closed_by_button = 'select'
