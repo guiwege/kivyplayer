@@ -81,10 +81,12 @@ class FirstScreen(Screen):
                     app.load_songs_from_dir(popup.selection)
 
     def open_popup_save_to_playlist(self):
-        popup = PopupCreatePlaylist()
-        popup.title = "Playlist name (Overwrite)"
-        popup.bind(on_dismiss=self.save_to_playlist_by_popup)
-        popup.open()
+        app = App.get_running_app()
+        if app.default_playlist:
+            popup = PopupCreatePlaylist()
+            popup.title = "Save to Playlist (Overwrite): "
+            popup.bind(on_dismiss=self.save_to_playlist_by_popup)
+            popup.open()
 
     def save_to_playlist_by_popup(self, popup=None):
         if popup:
@@ -101,9 +103,18 @@ class FirstScreen(Screen):
 
     def open_popup_load_playlist(self):
         popup = PopupLoadPlaylist()
+        popup.title = 'Load Playlist'
         popup.open()
 
 
+    def open_popup_add_song_to_playlist(self):
+        app = App.get_running_app()
+        if app.default_playlist:
+            _, song = app.default_playlist[app.playing_index]
+            popup = PopupAddSongToPlaylist(song=song)
+            popup.bind(on_dismiss=partial(print, 1))
+            popup.bind(on_dismiss=partial(print, 2))
+            popup.open()
 
         
 class SelectableRecycleBoxLayout(FocusBehavior, LayoutSelectionBehavior, RecycleBoxLayout):
@@ -177,7 +188,7 @@ class KivyPlayerApp(App):
         if not self.store.exists('general'):
             self.store.put(
                 'general',
-                volume=0, 
+                volume=0.05, 
                 browse_dir=os.getcwd(), 
                 playlists_dir=os.getcwd(),
                 shuffle=False,
@@ -362,7 +373,7 @@ class KivyPlayerApp(App):
 
         self.song_images = []
         self.song_images_index = 0
-        self.song_images_display_elapsed += 0
+        self.song_images_display_elapsed = 0
         #seartext = input("enter the search term: ")
         #count = input("Enter the number of images you need:")
         index, song = self.default_playlist[self.playing_index]
@@ -402,7 +413,7 @@ class KivyPlayerApp(App):
     def song_images_load2(self, *args):
         self.song_images = []
         self.song_images_index = 0
-        self.song_images_display_elapsed += 0
+        self.song_images_display_elapsed = 0
         #seartext = input("enter the search term: ")
         #count = input("Enter the number of images you need:")
         index, song = self.default_playlist[self.playing_index]
@@ -496,16 +507,15 @@ class KivyPlayerApp(App):
                         break
 
     def scroll_to_playing(self, *args):
-        app = App.get_running_app()
-        rv = app.root.ids.first_screen.ids.rv
-
+        rv = self.root.ids.first_screen.ids.rv
+        self.root.ids.first_screen.ids.sm.current = 'playlist'
         # scroll only when the items size > the screen size
         if rv.children[0].height < rv.height:
             return
 
         rv.deselect_all()
 
-        item_size = app.playlist_item_height
+        item_size = self.playlist_item_height
         total_items_on_screen = math.floor(rv.height / item_size)
         
         if self.playing_index <= total_items_on_screen:
@@ -519,7 +529,6 @@ class KivyPlayerApp(App):
         
             #perc = 1-(self.playing_index / len(self.default_playlist))
             #rv.scroll_y = perc #0=fim, 1=inicio
-
         Clock.schedule_once(partial(rv.highlight_index, self.playing_index))
 
 
