@@ -29,7 +29,7 @@ from kivy.storage.jsonstore import JsonStore
 from random import randint
 from functools import partial, singledispatch
 from datetime import datetime
-from recycleviews import RVPlaylist, RVPlaylistItem
+from recycleviews import RVPlaylist
 from popups import PopupAddSongToPlaylist, PopupDirChooser
 from song import Song
 

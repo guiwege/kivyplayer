@@ -48,7 +48,7 @@ from random import randint
 from functools import partial, singledispatch
 from datetime import datetime
 from pynput.keyboard import Listener
-from recycleviews import RVPlaylist, RVPlaylistItem
+from recycleviews import RVPlaylist
 from popups import PopupAddSongToPlaylist, PopupDirChooser, PopupCreatePlaylist, PopupLoadPlaylist
 from song import Song
 from settings import SettingsScreen
@@ -152,7 +152,7 @@ class KivyPlayerApp(App):
     song_images_index = NumericProperty(0)
     song_images_last_album = ''
 
-    #on_mouse_over_widgets = ListProperty([])
+    #mouse_over_behavior_widgets = ListProperty([])
     #mouse_pos = None
 
     # storage
@@ -232,18 +232,24 @@ class KivyPlayerApp(App):
         if bouncing_label.x < -(bouncing_label.parent.width/2 + bouncing_label.texture_size[0]/2):
             bouncing_label.x = bouncing_label.parent.width/2 + bouncing_label.texture_size[0]/2
 
-        # Do things on MouseOverBehavior widgets
+        # Do stuff on MouseOverBehavior widgets
         pos = Window.mouse_pos
         #print(pos)
         try:
-            for widget in self.on_mouse_over_widgets:
+            for widget in self.mouse_over_behavior_widgets:
                 local_pos = widget.to_window(*widget.pos)
                 if (pos[0] >= local_pos[0] and pos[0] <= local_pos[0]+widget.width
                 and pos[1] >= local_pos[1] and pos[1] <= local_pos[1]+widget.height):
                     widget.mouse_over = True
                 else:
                     widget.mouse_over = False
+        except Exception:
+            pass
 
+        # Do stuff on DoubleClickBehavior widgets
+        try:
+            for widget in self.double_click_behavior_widgets:
+                pass
         except Exception:
             pass
 
@@ -307,7 +313,7 @@ class KivyPlayerApp(App):
         self.song_time_elapsed = ':'.join(hms)
         
         
-    def song_play(self):
+    def song_play(self, *args):
         if not self.default_playlist:
             return
 

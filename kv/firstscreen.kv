@@ -189,15 +189,31 @@
                     background_horizontal: 'sliderh_background.png'
                     orientation: 'horizontal'
 
+            Widget: # Separator
+                size_hint: 1, None
+                height: dp(5)
+                canvas:
+                    Color:
+                        rgba: (0, 0, 0, 0)
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
 
             BoxLayout:
                 orientation: 'horizontal'
                 size_hint: 1, None
                 height: dp(25)
+                hsep: dp(10)
 
+                Widget:
+                    size_hint: None, 1
+                    width: self.parent.hsep
+                
                 #ButtonLabel:
                 ButtonImage:
                     #text: 'Load dir'
+                    size_hint: None, 1
+                    width: self.height + self.parent.hsep
                     source: 'icons/load_dir.png'
                     #on_press: app.load_from_dir_open_popup(app.root.ids.settings_screen.browse_dir)
                     #on_press: Factory.PopupDirChooser(app.load_songs_from_dir, path=app.root.ids.settings_screen.browse_dir).open()
@@ -206,19 +222,25 @@
                 #ButtonLabel:
                 ButtonImage:
                     #text: 'Load PL'
+                    size_hint: None, 1
+                    width: self.height + self.parent.hsep
                     source: 'icons/load_playlist.png'
                     on_press: root.open_popup_load_playlist()
 
                 #ButtonLabel:
                 ButtonImage:
                     #text: 'Save to PL'
+                    size_hint: None, 1
+                    width: self.height + self.parent.hsep
                     source: 'icons/save_playlist.png'
                     on_press: root.open_popup_save_to_playlist()
 
                 AnchorLayout:
                     anchor_x: 'center'
                     anchor_y: 'center'
-
+                    size_hint: None, 1
+                    width: self.height + self.parent.hsep
+                    
                     ButtonLabel:
                     #ButtonImage:
                         size_hint: None, None
@@ -226,7 +248,7 @@
                         height: self.parent.height
                         #text: 'Cinema'
                         text: ''
-                        #source: 'icons/cinema_mode.png'
+                        #source: 'icons/cinema_mode.png' if root.ids.sm.current=='playlist' else 'icons/cinema_mode_color.png'
                         on_release: sm.current = 'album_image' if sm.current=='playlist' else 'playlist'
                         canvas.before:
                             Color:
@@ -236,13 +258,30 @@
                                 size: self.size
                                 source: 'icons/cinema_mode.png'
 
-                ButtonLabel:
-                    text: 'Clear'
+                Widget:
+
+                #ButtonLabel:
+                ButtonImage:
+                    size_hint: None, 1
+                    width: self.height + self.parent.hsep
+                    #text: 'Clear'
+                    source: 'icons/clear.png'
                     on_press: app.songs_clear()
 
-                ButtonLabel:
-                    text: 'Settings'
+                #ButtonLabel:
+                ButtonImage:
+                    size_hint: None, 1
+                    width: self.height + self.parent.hsep
+                    #text: 'Settings'
+                    width: self.height + self.parent.hsep
+                    source: 'icons/settings.png'
                     on_press: app.goto_settings_screen()
+
+                Widget:
+                    size_hint: None, 1
+                    width: self.parent.hsep
+
+
             Widget:
                 size_hint: 1, None
                 height: dp(5)

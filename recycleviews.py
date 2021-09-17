@@ -1,6 +1,5 @@
 
 import os
-import time
 import random
 import re
 import math
@@ -30,7 +29,7 @@ from functools import partial
 from datetime import datetime
 from popups import PopupAddSongToPlaylist
 from behaviors import MouseOverBehavior
-
+from time import time
 
 class RVPlaylist(RecycleView):
 
@@ -84,6 +83,7 @@ class RVPlaylistItemNew(RecycleDataViewBehavior, MouseOverBehavior, RelativeLayo
     selectable = BooleanProperty(True)
     text = StringProperty('')
     song = ObjectProperty(None)
+    last_click_epoch = 0.0
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -104,6 +104,13 @@ class RVPlaylistItemNew(RecycleDataViewBehavior, MouseOverBehavior, RelativeLayo
         if self.collide_point(*touch.pos) and self.selectable:
             print('on_touch_down:', touch)
             
+            new_click_epoch = time()
+            if new_click_epoch-self.last_click_epoch<0.2:
+                print('double click')
+                app = App.get_running_app()
+                Clock.schedule_once(app.song_play)
+            self.last_click_epoch = new_click_epoch
+
             rv.deselect_all()
             return self.parent.select_with_touch(self.index, touch)
 
@@ -122,7 +129,8 @@ class RVPlaylistItemNew(RecycleDataViewBehavior, MouseOverBehavior, RelativeLayo
             app.selected_index = self.index
         else:
             pass
-        
+
+
     def open_popup_add_song_to_playlist(self):
         popup = PopupAddSongToPlaylist(song=self.song)
         popup.bind(on_dismiss=partial(print, 1))
@@ -138,57 +146,6 @@ class RVPlaylistItemNew(RecycleDataViewBehavior, MouseOverBehavior, RelativeLayo
 
 
 
-class RVPlaylistItem(RecycleDataViewBehavior, RelativeLayout):
-    ''' Add selection support to the Label '''
-    index = None
-    selected = BooleanProperty(False)
-    selectable = BooleanProperty(True)
-    text = StringProperty('')
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        #with self.canvas.before:
-        #    Color(1, 0, .4, mode='rgb')
-        #self.last_item = kwargs.get('last_item')
-        #Clock.schedule_once(self.finish_init)
-
-
-    def refresh_view_attrs(self, rv, index, data):
-        ''' Catch and handle the view changes '''
-        self.index = index
-        return super(RVPlaylistItem, self).refresh_view_attrs(
-            rv, index, data)
-
-    def on_touch_down(self, touch):
-        app = App.get_running_app()
-        rv = app.root.ids.first_screen.ids.rv
-
-        ''' Add selection on touch down '''
-        if super(RVPlaylistItem, self).on_touch_down(touch):
-            return True
-        if self.collide_point(*touch.pos) and self.selectable:
-            print('on_touch_down:', touch)
-            
-            rv.deselect_all()
-            return self.parent.select_with_touch(self.index, touch)
-
-    def on_touch_up(self, touch):
-        #print(self.y)
-        pass
-        
-    def apply_selection(self, rv, index, is_selected):
-        app = App.get_running_app()
-        rv = app.root.ids.first_screen.ids.rv
-
-        self.selected = is_selected
-        if is_selected:
-            print("selection changed to {0} :{1}".format(index, rv.data[index]))
-            #print('apply_selection self:', self)
-            app = App.get_running_app()
-            app.selected_index = self.index
-        else:
-            #print("selection removed for {0}".format(rv.data[index]))
-            pass
         
     def open_popup_add_song_to_playlist(self):
         popup = PopupAddSongToPlaylist(song=self.song)
